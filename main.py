@@ -1,16 +1,30 @@
-# This is a sample Python script.
+import wikipedia, re
+import telebot
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+wikipedia.set_lang('uk')
+bot = telebot.TeleBot("6134715132:AAFhSOr25h_Um6ESixvvPi3JUSzHL9xAI4g")
+def get_wiki(s):
+    try:
+        ny = wikipedia.page(s)
+        wikitext = ny.content[:1000]
+        wikimas = wikitext.split('.')
+        wikimas = wikitext[:-1]
+        wikitext2 = ''
+        for x in wikimas:
+            if not('==' in x):
+                if (len((x.strip()))>3):
+                    wikitext2 = wikitext2 + x + "."
+                    return wikitext2
+                return wikimas
+        wikitext2 = re.sub("\([^()]*\)", '', wikitext2)
+        wikitext2 = re.sub("\([^()]*\)", '', wikitext2)
+        wikitext2 = re.sub("\{[\{\}]*\)", '', wikitext2)
+        return wikitext2
+    except Exception as e:
+        return "такого немає"
 
+@bot.message_handler(content_types=['text'])
+def handle_text(message):
+    bot.send_message(message.chat.id, get_wiki(message.text))
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+bot.polling()
